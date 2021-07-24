@@ -1,0 +1,13 @@
+{
+	"compilerOptions": {
+		"target": "es2019",
+		"strict": true,
+		"module": "commonjs",
+		"moduleResolution": "node",
+		"removeComments": false,
+		"esModuleInterop": true,
+		"resolveJsonModule": true,
+		"lib": ["es2020"]
+	},
+	"exclude": []
+}

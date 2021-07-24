@@ -1,0 +1,15 @@
+name: Backport
+description: Automatically creates a cherry pick PR
+inputs:
+  token:
+    description: GitHub token with issue, comment, and label read/write permissions
+    default: ${{ github.token }}
+  title:
+    description: Title for the backport PR
+    default: "{{originalTitle}}"
+  labelsToAdd:
+    description: Comma separated list of labels to add to the backport PR.
+    required: false
+runs:
+  using: 'node12'
+  main: 'index.js'
