@@ -62,13 +62,12 @@ const backportOnce = async ({ base, body, commitToBackport, github, head, labels
         title,
     });
     const pullRequestNumber = createRsp.data.number;
-    // Sync milestone
-    if (milestone && milestone.id) {
-        await github.issues.update({
-            repo,
-            owner,
+    if (labelsToAdd.length > 0) {
+        await github.issues.addLabels({
             issue_number: pullRequestNumber,
-            milestone: milestone.number,
+            labels: labelsToAdd,
+            owner,
+            repo,
         });
     }
     // Remove default reviewers
@@ -88,14 +87,6 @@ const backportOnce = async ({ base, body, commitToBackport, github, head, labels
             repo,
             owner,
             reviewers: [mergedBy.login],
-        });
-    }
-    if (labelsToAdd.length > 0) {
-        await github.issues.addLabels({
-            issue_number: pullRequestNumber,
-            labels: labelsToAdd,
-            owner,
-            repo,
         });
     }
 };

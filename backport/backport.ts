@@ -122,13 +122,12 @@ const backportOnce = async ({
 
 	const pullRequestNumber = createRsp.data.number
 
-	// Sync milestone
-	if (milestone && milestone.id) {
-		await github.issues.update({
-			repo,
-			owner,
+	if (labelsToAdd.length > 0) {
+		await github.issues.addLabels({
 			issue_number: pullRequestNumber,
-			milestone: milestone.number,
+			labels: labelsToAdd,
+			owner,
+			repo,
 		})
 	}
 
@@ -153,14 +152,6 @@ const backportOnce = async ({
 		})
 	}
 
-	if (labelsToAdd.length > 0) {
-		await github.issues.addLabels({
-			issue_number: pullRequestNumber,
-			labels: labelsToAdd,
-			owner,
-			repo,
-		})
-	}
 }
 
 const getFailedBackportCommentBody = ({
