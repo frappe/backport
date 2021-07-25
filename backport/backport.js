@@ -30,7 +30,7 @@ const getBackportBaseToHead = ({ action, label, labels, pullRequestNumber, }) =>
     getLabelNames({ action, label, labels }).forEach((labelName) => {
         const matches = labelRegExp.exec(labelName);
         if (matches !== null) {
-            const [, base, head = `backport-${pullRequestNumber}-to-${base}`] = matches;
+            const [, base, head = `backport/${base}/${pullRequestNumber}`] = matches;
             baseToHead[base] = head;
         }
     });

@@ -57,7 +57,7 @@ const getBackportBaseToHead = ({
 		const matches = labelRegExp.exec(labelName)
 
 		if (matches !== null) {
-			const [, base, head = `backport-${pullRequestNumber}-to-${base}`] = matches
+			const [, base, head = `backport/${base}/${pullRequestNumber}`] = matches
 			baseToHead[base] = head
 		}
 	})
