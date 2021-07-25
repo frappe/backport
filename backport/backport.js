@@ -15,6 +15,7 @@ async function cloneRepo({ token, owner, repo }) {
     await exec_1.exec('git', ['config', '--global', 'user.email', 'developers@frappe.io']);
     await exec_1.exec('git', ['config', '--global', 'user.name', 'frappe-pr-bot']);
 }
+const BACKPORT_OWNER = "frappe-pr-bot";
 const getLabelNames = ({ action, label, labels, }) => {
     switch (action) {
         case 'closed':
@@ -36,10 +37,12 @@ const getBackportBaseToHead = ({ action, label, labels, pullRequestNumber, }) =>
     });
     return baseToHead;
 };
-const backportOnce = async ({ base, body, commitToBackport, github, head, labelsToAdd, owner, repo, title, milestone, mergedBy, }) => {
+const backportOnce = async ({ base, body, commitToBackport, github, head, labelsToAdd, owner, repo, title, milestone, mergedBy, token, }) => {
     const git = async (...args) => {
         await exec_1.exec('git', args, { cwd: repo });
     };
+    const fork_url = `https://x-access-token:${token}@github.com/${BACKPORT_OWNER}/${repo}.git`;
+    await git('remote', 'add', 'backport', fork_url);
     await git('switch', base);
     await git('switch', '--create', head);
     try {
@@ -49,11 +52,11 @@ const backportOnce = async ({ base, body, commitToBackport, github, head, labels
         await git('cherry-pick', '--abort');
         throw error;
     }
-    await git('push', '--set-upstream', 'origin', head);
+    await git('push', '--set-upstream', 'backport', head);
     const createRsp = await github.pulls.create({
         base,
         body,
-        head,
+        head: `${BACKPORT_OWNER}:${head}`,
         owner,
         repo,
         title,
@@ -161,6 +164,7 @@ const backport = async ({ labelsToAdd, payload: { action, label, pull_request: {
                     title,
                     milestone,
                     mergedBy: merged_by,
+                    token: token,
                 });
             }
             catch (error) {

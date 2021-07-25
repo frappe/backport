@@ -21,6 +21,8 @@ async function cloneRepo({ token, owner, repo }: CloneProps) {
 	await exec('git', ['config', '--global', 'user.name', 'frappe-pr-bot'])
 }
 
+const BACKPORT_OWNER = "frappe-pr-bot"
+
 const getLabelNames = ({
 	action,
 	label,
@@ -77,6 +79,7 @@ const backportOnce = async ({
 	title,
 	milestone,
 	mergedBy,
+	token,
 }: {
 	base: string
 	body: string
@@ -89,11 +92,15 @@ const backportOnce = async ({
 	title: string
 	milestone: EventPayloads.WebhookPayloadPullRequestPullRequestMilestone
 	mergedBy: any
+	token: string
 }) => {
 	const git = async (...args: string[]) => {
 		await exec('git', args, { cwd: repo })
 	}
 
+	const fork_url = `https://x-access-token:${token}@github.com/${BACKPORT_OWNER}/${repo}.git`
+
+	await git('remote', 'add', 'backport', fork_url)
 	await git('switch', base)
 	await git('switch', '--create', head)
 	try {
@@ -103,11 +110,11 @@ const backportOnce = async ({
 		throw error
 	}
 
-	await git('push', '--set-upstream', 'origin', head)
+	await git('push', '--set-upstream', 'backport', head)
 	const createRsp = await github.pulls.create({
 		base,
 		body,
-		head,
+		head: `${BACKPORT_OWNER}:${head}`,
 		owner,
 		repo,
 		title,
@@ -269,6 +276,7 @@ const backport = async ({
 					title,
 					milestone,
 					mergedBy: merged_by,
+					token: token,
 				})
 			} catch (error) {
 				const errorMessage: string = error.message
