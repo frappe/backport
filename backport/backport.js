@@ -61,15 +61,6 @@ const backportOnce = async ({ base, body, commitToBackport, github, head, labels
         repo,
         title,
     });
-    const pullRequestNumber = createRsp.data.number;
-    if (labelsToAdd.length > 0) {
-        await github.issues.addLabels({
-            issue_number: pullRequestNumber,
-            labels: labelsToAdd,
-            owner,
-            repo,
-        });
-    }
 };
 const getFailedBackportCommentBody = ({ base, commitToBackport, errorMessage, head, }) => {
     return [
