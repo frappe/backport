@@ -10,12 +10,14 @@ const core_1 = require("@actions/core");
 const exec_1 = require("@actions/exec");
 const lodash_escaperegexp_1 = __importDefault(require("lodash.escaperegexp"));
 const labelRegExp = /^backport ([^ ]+)(?: ([^ ]+))?$/;
+const BACKPORT_OWNER = "frappe-pr-bot";
 async function cloneRepo({ token, owner, repo }) {
     await exec_1.exec('git', ['clone', `https://x-access-token:${token}@github.com/${owner}/${repo}.git`]);
     await exec_1.exec('git', ['config', '--global', 'user.email', 'developers@frappe.io']);
     await exec_1.exec('git', ['config', '--global', 'user.name', 'frappe-pr-bot']);
+    const fork_url = `https://x-access-token:${token}@github.com/${BACKPORT_OWNER}/${repo}.git`;
+    await exec_1.exec('git', ['remote', 'add', 'backport', fork_url]);
 }
-const BACKPORT_OWNER = "frappe-pr-bot";
 const getLabelNames = ({ action, label, labels, }) => {
     switch (action) {
         case 'closed':
@@ -41,8 +43,6 @@ const backportOnce = async ({ base, body, commitToBackport, github, head, labels
     const git = async (...args) => {
         await exec_1.exec('git', args, { cwd: repo });
     };
-    const fork_url = `https://x-access-token:${token}@github.com/${BACKPORT_OWNER}/${repo}.git`;
-    await git('remote', 'add', 'backport', fork_url);
     await git('switch', base);
     await git('switch', '--create', head);
     try {

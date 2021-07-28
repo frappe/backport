@@ -15,13 +15,16 @@ interface CloneProps {
 	repo: string
 }
 
+const BACKPORT_OWNER = "frappe-pr-bot"
+
 async function cloneRepo({ token, owner, repo }: CloneProps) {
 	await exec('git', ['clone', `https://x-access-token:${token}@github.com/${owner}/${repo}.git`])
 	await exec('git', ['config', '--global', 'user.email', 'developers@frappe.io'])
 	await exec('git', ['config', '--global', 'user.name', 'frappe-pr-bot'])
-}
 
-const BACKPORT_OWNER = "frappe-pr-bot"
+	const fork_url = `https://x-access-token:${token}@github.com/${BACKPORT_OWNER}/${repo}.git`
+	await exec('git', ['remote', 'add', 'backport', fork_url])
+}
 
 const getLabelNames = ({
 	action,
@@ -98,9 +101,6 @@ const backportOnce = async ({
 		await exec('git', args, { cwd: repo })
 	}
 
-	const fork_url = `https://x-access-token:${token}@github.com/${BACKPORT_OWNER}/${repo}.git`
-
-	await git('remote', 'add', 'backport', fork_url)
 	await git('switch', base)
 	await git('switch', '--create', head)
 	try {
