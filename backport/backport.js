@@ -68,21 +68,6 @@ const getFailedBackportCommentBody = ({ base, commitToBackport, errorMessage, he
         '```',
         errorMessage,
         '```',
-        'To backport manually, run these commands in your terminal:',
-        '```bash',
-        '# Fetch latest updates from GitHub',
-        'git fetch',
-        '# Create a new branch',
-        `git switch --create ${head} origin/${base}`,
-        '# Cherry-pick the merged commit of this pull request and resolve the conflicts',
-        `git cherry-pick -x ${commitToBackport}`,
-        '# Push it to GitHub',
-        `git push --set-upstream origin ${head}`,
-        `git switch main`,
-        '# Remove the local backport branch',
-        `git branch -D ${head}`,
-        '```',
-        `Then, create a pull request where the \`base\` branch is \`${base}\` and the \`compare\`/\`head\` branch is \`${head}\`.`,
     ].join('\n');
 };
 const backport = async ({ labelsToAdd, payload: { action, label, pull_request: { labels, merge_commit_sha: mergeCommitSha, merged, number: pullRequestNumber, title: originalTitle, milestone, merged_by, }, repository: { name: repo, owner: { login: owner }, }, }, titleTemplate, token, github, }) => {
