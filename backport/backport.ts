@@ -23,7 +23,7 @@ async function cloneRepo({ token, owner, repo }: CloneProps) {
 	await exec('git', ['config', '--global', 'user.name', 'frappe-pr-bot'])
 
 	const fork_url = `https://x-access-token:${token}@github.com/${BACKPORT_OWNER}/${repo}.git`
-	await exec('git', ['remote', 'add', 'backport', fork_url])
+	await exec('git', [ '-C', repo, 'remote', 'add', 'backport', fork_url])
 }
 
 const getLabelNames = ({
