@@ -130,6 +130,28 @@ const backportOnce = async ({
 			repo,
 		})
 	}
+
+	// Remove default reviewers
+	if (createRsp.data.requested_reviewers) {
+		const reviewers = createRsp.data.requested_reviewers.map((user) => user.login)
+		await github.pulls.deleteReviewRequest({
+			pull_number: pullRequestNumber,
+			repo,
+			owner,
+			reviewers: reviewers,
+		})
+	}
+
+	if (mergedBy) {
+		// Assign to merger
+		await github.pulls.createReviewRequest({
+			pull_number: pullRequestNumber,
+			repo,
+			owner,
+			reviewers: [mergedBy.login],
+		})
+	}
+
 }
 
 const getFailedBackportCommentBody = ({
