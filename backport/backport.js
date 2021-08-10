@@ -49,8 +49,10 @@ const backportOnce = async ({ base, body, commitToBackport, github, head, labels
         await git('cherry-pick', '-x', commitToBackport);
     }
     catch (error) {
-        await git('cherry-pick', '--abort');
-        throw error;
+        body += "⚠️  CONFLICTS detected ⚠️  \n";
+        body += "Please resolve conflicts and verify diff with original PR before merging.";
+        await git('add', '*'); // YOLO
+        await git('commit', '-a', '--no-edit', '--allow-empty');
     }
     await git('push', '--set-upstream', 'backport', head);
     const createRsp = await github.pulls.create({
