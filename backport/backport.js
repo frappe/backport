@@ -64,7 +64,8 @@ const backportOnce = async ({ base, body, commitToBackport, github, head, labels
 };
 const getFailedBackportCommentBody = ({ base, commitToBackport, errorMessage, head, }) => {
     return [
-        `The backport to \`${base}\` failed:`,
+        `The backport to \`${base}\` failed.`,
+        `Please backport the PR manually. 🤖 `,
         '```',
         errorMessage,
         '```',

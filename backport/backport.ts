@@ -133,7 +133,8 @@ const getFailedBackportCommentBody = ({
 	head: string
 }) => {
 	return [
-		`The backport to \`${base}\` failed:`,
+		`The backport to \`${base}\` failed.`,
+		`Please backport the PR manually. 🤖 `,
 		'```',
 		errorMessage,
 		'```',
