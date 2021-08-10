@@ -101,13 +101,16 @@ const backportOnce = async ({
 		await exec('git', args, { cwd: repo })
 	}
 
+	let isDraft = false;
+
 	await git('switch', base)
 	await git('switch', '--create', head)
 	try {
 		await git('cherry-pick', '-x', commitToBackport)
 	} catch (error) {
-                body += "⚠️  CONFLICTS detected ⚠️  \n"
-                body += "Please resolve conflicts and verify diff with original PR before merging."
+		isDraft = true;
+		body += "\n\n ⚠️  CONFLICTS detected ⚠️  \n"
+		body += "Please resolve conflicts and verify diff with original PR before merging."
 		await git('add', '*') // YOLO
 		await git('commit', '-a', '--no-edit', '--allow-empty')
 	}
@@ -120,6 +123,7 @@ const backportOnce = async ({
 		owner,
 		repo,
 		title,
+		draft: isDraft,
 	})
 }
 
